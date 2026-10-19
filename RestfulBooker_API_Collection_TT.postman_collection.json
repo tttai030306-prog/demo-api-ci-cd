@@ -1,0 +1,291 @@
+{
+  "info": {
+    "_postman_id": "a728efd4-ff9b-4a66-a24b-46e71f21c6e7",
+    "name": "RestfulBooker_API_Collection_TT",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "59052060",
+    "_collection_link": "https://go.postman.co/collection/59052060-a728efd4-ff9b-4a66-a24b-46e71f21c6e7?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Positives_Cases",
+      "item": [
+        {
+          "name": "Valid Authentication",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Đăng nhập thành công (Status 200)\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// Lưu token vào biến môi trường\r\nvar jsonData = pm.response.json();\r\npm.environment.set(\"token\", jsonData.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"password123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://restful-booker.herokuapp.com/auth",
+              "protocol": "https",
+              "host": [
+                "restful-booker",
+                "herokuapp",
+                "com"
+              ],
+              "path": [
+                "auth"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Tạo booking thành công (Status 200)\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// Kiểm tra tên khách hàng khớp với dữ liệu từ file CSV\r\npm.test(\"Tên khách hàng khớp với dữ liệu đầu vào\", function () {\r\n    var jsonData = pm.response.json();\r\n    var expectedFirstName = pm.iterationData.get(\"firstname\");\r\n    pm.expect(jsonData.booking.firstname).to.eql(expectedFirstName);\r\n});\r\n\r\n// Lưu lại ID\r\nvar jsonData = pm.response.json();\r\npm.environment.set(\"bookingid\", jsonData.bookingid);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstname\": \"{{firstname}}\",\r\n    \"lastname\": \"{{lastname}}\",\r\n    \"totalprice\": {{totalprice}},\r\n    \"depositpaid\": {{depositpaid}},\r\n    \"bookingdates\": {\r\n        \"checkin\": \"{{checkin}}\",\r\n        \"checkout\": \"{{checkout}}\"\r\n    },\r\n    \"additionalneeds\": \"{{additionalneeds}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://restful-booker.herokuapp.com/booking",
+              "protocol": "https",
+              "host": [
+                "restful-booker",
+                "herokuapp",
+                "com"
+              ],
+              "path": [
+                "booking"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Lấy thông tin thành công (Status 200)\", function () {\r\n    pm.response.to.have.status(200);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://restful-booker.herokuapp.com/booking/",
+              "protocol": "https",
+              "host": [
+                "restful-booker",
+                "herokuapp",
+                "com"
+              ],
+              "path": [
+                "booking",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Clean Data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Xóa thành công (Status 201 Created)\", function () {\r\n    pm.response.to.have.status(201);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "token={{token}}"
+              }
+            ],
+            "url": {
+              "raw": "https://restful-booker.herokuapp.com/booking/",
+              "protocol": "https",
+              "host": [
+                "restful-booker",
+                "herokuapp",
+                "com"
+              ],
+              "path": [
+                "booking",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative_Cases",
+      "item": [
+        {
+          "name": "Invalid Authorization",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Hệ thống chặn truy cập (Status 403 Forbidden)\", function () {\r\n    pm.response.to.have.status(403);\r\n});\r\n\r\npm.test(\"Nội dung phản hồi là chữ Forbidden\", function () {\r\n    pm.expect(pm.response.text()).to.eql(\"Forbidden\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://restful-booker.herokuapp.com/booking/",
+              "protocol": "https",
+              "host": [
+                "restful-booker",
+                "herokuapp",
+                "com"
+              ],
+              "path": [
+                "booking",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Authentication",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code vẫn là 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Hệ thống từ chối cấp token (Bad credentials)\", function () {\r\n    var jsonData = pm.response.json();\r\n    pm.expect(jsonData.reason).to.eql(\"Bad credentials\");\r\n    // Kiểm tra chắc chắn hệ thống không rò rỉ token\r\n    pm.expect(jsonData).to.not.have.property(\"token\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"wrongpassword123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://restful-booker.herokuapp.com/auth",
+              "protocol": "https",
+              "host": [
+                "restful-booker",
+                "herokuapp",
+                "com"
+              ],
+              "path": [
+                "auth"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Input Data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Máy chủ không xử lý được dữ liệu thiếu (Status 500)\", function () {\r\n    pm.response.to.have.status(500);\r\n});\r\n\r\npm.test(\"Nội dung báo lỗi Internal Server Error\", function () {\r\n    pm.expect(pm.response.text()).to.include(\"Internal Server Error\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstname\": \"Hacker\",\r\n    \"lastname\": \"Test\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://restful-booker.herokuapp.com/booking",
+              "protocol": "https",
+              "host": [
+                "restful-booker",
+                "herokuapp",
+                "com"
+              ],
+              "path": [
+                "booking"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
